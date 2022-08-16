@@ -29,6 +29,7 @@ Route::get('/', function () {
 //Acrescentado middleware()
 Route::middleware(logAcessoMiddleware::class)
     ->get('/',[\App\Http\Controllers\PrincipalController::class,'principal'])
+    ->middleware('log.acesso')
     ->name('site.index');
 
 /*
@@ -46,14 +47,18 @@ Route::get('/sobre-nos',[\App\Http\Controllers\SobreNosController::class,'sobreN
 // Alterado na aula 135 acrescentado middleware
 //Route::get('/contato',[\App\Http\Controllers\ContatoController::class,'contato'])->name('site.contato');
 Route::middleware(logAcessoMiddleware::class)
-    ->get('/contato',[\App\Http\Controllers\ContatoController::class,'contato'])
+   // ->get('/contato',[\App\Http\Controllers\ContatoController::class,'contato'])
     ->name('site.contato');
 
 
 //Aula 122 - alterado da função contato para função salvar
 Route::post('/contato',[\App\Http\Controllers\ContatoController::class,'salvar'])->name('site.contato');
 
-Route::get('/login',function(){ return 'login';})->name('site.login');
+
+// AULA 145 - Implementação do login
+Route::get('/login/{erro?}',[\App\Http\Controllers\LoginController::class,'index'])->name('site.login');
+Route::post('/login',[\App\Http\Controllers\LoginController::class,'autenticar'])->name('site.login');
+
 
 /*
 comentario: criado na aula 33 para estudo de expressões regulares
@@ -69,11 +74,28 @@ Route::get(
 )->where('categoria_id', '[0-9]+')->where('nome', '[A-Za-z]+');
 */
 
-Route::prefix('/app')->group(function(){
-    Route::get('/clientes',function(){ return 'clientes';})->name('app.clientes');
+
+// Aula 142 acrescentado o middleware para todo o grupo de rotas em vez de rota individuais
+// Aula 143 acrescentado parametros para ser passar o middleware
+Route::middleware('autenticacao:padrao,visitante')->prefix('/app')->group(function(){
+
+    Route::get('/cliente',[\App\Http\Controllers\ClienteController::class,'index'])
+        ->name('app.cliente');
+
     //Route::get('/fornecedores',function(){ return 'fornecedores';})->name('app.fornecedores');
-    Route::get('/fornecedores',[\App\Http\Controllers\FornecedorController::class,'index'])->name('app.fornecedores');
-    Route::get('/produtos',function(){ return 'produtos';})->name('app.produtos');
+    Route::get('/fornecedor',[\App\Http\Controllers\FornecedorController::class,'index'])
+        ->name('app.fornecedor');
+
+    Route::get('/produto',[\App\Http\Controllers\ProdutoController::class,'index'])
+        ->name('app.produto');
+
+
+    //Aula 150 - Implementando o menu de opções
+    Route::get('/home',[\App\Http\Controllers\HomeController::class,'index'])         
+        ->name('app.home');       
+
+    Route::get('/sair',[\App\Http\Controllers\LoginController::class,'sair'])         
+        ->name('app.sair');
 });
 
 /* Aulas 38: Redirecionanento de rotas 
