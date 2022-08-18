@@ -52,6 +52,7 @@ Route::middleware(logAcessoMiddleware::class)
 
 
 //Aula 122 - alterado da função contato para função salvar
+Route::get('/contato',[\App\Http\Controllers\ContatoController::class,'contato'])->name('site.contato');
 Route::post('/contato',[\App\Http\Controllers\ContatoController::class,'salvar'])->name('site.contato');
 
 
@@ -85,6 +86,23 @@ Route::middleware('autenticacao:padrao,visitante')->prefix('/app')->group(functi
     //Route::get('/fornecedores',function(){ return 'fornecedores';})->name('app.fornecedores');
     Route::get('/fornecedor',[\App\Http\Controllers\FornecedorController::class,'index'])
         ->name('app.fornecedor');
+
+    //aula 152 implementando o cadastro de fornecedores
+    Route::post('/fornecedor/listar',[\App\Http\Controllers\FornecedorController::class,'listar'])
+        ->name('app.fornecedor.listar');
+
+    //aula 156 implementando paginação
+    Route::get('/fornecedor/listar',[\App\Http\Controllers\FornecedorController::class,'listar'])
+        ->name('app.fornecedor.listar');        
+        
+    Route::get('/fornecedor/adicionar',[\App\Http\Controllers\FornecedorController::class,'adicionar'])
+        ->name('app.fornecedor.adicionar');        
+
+    Route::post('/fornecedor/adicionar',[\App\Http\Controllers\FornecedorController::class,'adicionar'])
+        ->name('app.fornecedor.adicionar');
+    
+    Route::get('/fornecedor/editar/{id}/{msg?}',[\App\Http\Controllers\FornecedorController::class,'editar'])
+        ->name('app.fornecedor.editar');        
 
     Route::get('/produto',[\App\Http\Controllers\ProdutoController::class,'index'])
         ->name('app.produto');
