@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\Produto;
+use App\Models\PedidoProduto;
 
 
 class PedidoProdutoController extends Controller
@@ -27,6 +28,7 @@ class PedidoProdutoController extends Controller
     public function create(Pedido $pedido)
     {
         $produtos = Produto::all();
+        
         return view('app.pedido_produto.create',['pedido'=>$pedido,  'produtos' => $produtos]);
     }
 
@@ -38,13 +40,44 @@ class PedidoProdutoController extends Controller
      */
     public function store(Request $request, Pedido $pedido)
     {
-        echo '<pre>';
-        print_r($pedido);
-        echo '</pre>';
-        echo '<hr>';
-        echo '<pre>';
-        print_r($request->all());
-        echo '</pre>';
+        
+        // aula 194
+        $regras =[
+            'produto_id'  => 'exists:produtos,id',
+            'quantidade'  => 'required'
+        ];
+
+        $feedback = [
+            
+            'produto_id.exists' => 'Produto informado não existe',
+            'required' => 'O campo :attribute precisa ser preenchido'
+            
+        ];
+
+        $request->validate($regras,$feedback);
+        
+        /* Retirado na aula 197  (metodo 1 de insercão)
+        $pedidoProduto = new PedidoProduto();
+        $pedidoProduto->pedido_id = $pedido->id;
+        $pedidoProduto->produto_id = $request->get('produto_id');
+        $pedidoProduto->quantidade = $request->get('quantidade');
+        
+        $pedidoProduto->save();
+        */
+
+        /* Implementado e Retirado na aula 197  (metodo 2 de insercão)
+        $pedido->produtos()->attach(
+            $request->get('produto_id'),
+            ['quantidade' => $request->get('quantidade')]
+        );
+        */
+
+        //Aula 193 - metodo 3 de insersão (multiplos registros de uma só vez)
+        $pedido->produtos()->attach([
+            $request->get('produto_id') => ['quantidade' => $request->get('quantidade')]
+        ]);
+
+        return redirect()->route('pedido-produto.create',['pedido'=>$pedido->id]);
 
     }
 
@@ -85,11 +118,36 @@ class PedidoProdutoController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int  PedidoProduto $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(PedidoProduto $pedidoProduto, $pedido_id)
     {
-        //
+        //aula 198
+        /*
+        Print_r($pedido->getAttributes());
+        echo '<hr>';
+        Print_r($produto->getAttributes());
+        */
+        
+        //echo $pedido->id.' - '.$produto->id;
+
+        //forma convencional de deletar
+        /*
+        PedidoProduto::where([
+            'pedido_id' => $pedido->id,
+            'produto_id' => $produto->id
+        ])->delete();
+        */
+
+
+        //usando detach (deletar usando relacionamento)
+        //$pedido->produtos()->detach($produto->id);
+
+        $pedidoProduto->delete();
+
+        return redirect()->route('pedido-produto.create',['pedido'=>$pedido_id]);
+
+
     }
 }

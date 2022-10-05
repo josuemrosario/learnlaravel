@@ -12,6 +12,9 @@
     </select>
     {{$errors->has('produto_id') ? $errors->first('produto_id') : ''}}
 
+    {{-- aula 197 --}}
+    <input type="number" name="quantidade" value="{{ old('quantidade') ? old('quantidade') : ''}}" placeholder="quantidade" class="borda-preta">
+    {{$errors->has('quantidade') ? $errors->first('quantidade') : ''}}
 
     <button type="submit" class="borda-preta">Cadastrar</button>
 
