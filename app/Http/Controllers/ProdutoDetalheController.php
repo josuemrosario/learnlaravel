@@ -3,23 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Cliente;
+use App\Models\Unidade;
+use App\Models\ProdutoDetalhe;
+use App\Models\ItemDetalhe;
 
-class ClienteController extends Controller
+class ProdutoDetalheController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        
-        //aula 189
-        $clientes = Cliente::paginate(10);
-
-        //Aula 188
-        return view('app.cliente.index',['clientes'=>$clientes, 'request'=>$request->all()]);
+        //
     }
 
     /**
@@ -29,8 +26,8 @@ class ClienteController extends Controller
      */
     public function create()
     {
-        //aula 190
-        return view('app.cliente.create');
+        $unidades = Unidade::all();
+        return view('app.produto_detalhe.create',['unidades' => $unidades]);
     }
 
     /**
@@ -41,28 +38,8 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //aula 190
-        // validação de campos
-        $regras = [
-            'nome' => 'required|min:3|max:40'
-        ];
-
-        $feedback = [
-            'required' => 'O campo :attribute deve ser preenchido ',
-            'nome.min' => 'O  campo nome deve ter no mínimo 3 caracteres',
-            'nome.max' => 'O  campo nome deve ter no máximo 40 caracteres'
-        ];
-
-        $request->validate($regras, $feedback);
-
-
-        //Salva o cliente enviado pelo formulário
-        $clientes = new Cliente();
-        $clientes->nome = $request->get('nome');
-        $clientes->save();
-
-        return redirect()->route('cliente.index');
-
+        ProdutoDetalhe::create($request->all());
+        echo 'Cadastro realizado com sucesso';
     }
 
     /**
@@ -79,24 +56,28 @@ class ClienteController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  App\Models\ProdutoDetalhe $produtoDetalhe
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        //
+        //dd($produtoDetalhe);
+        $produtoDetalhe = ItemDetalhe::with(['item'])->find($id);
+        $unidades = Unidade::all();
+        return view('app.produto_detalhe.edit',['produto_detalhe'=>$produtoDetalhe, 'unidades' => $unidades]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  App\Models\ProdutoDetalhe $produtoDetalhe
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, ProdutoDetalhe $produtoDetalhe )
     {
-        //
+        $produtoDetalhe->update($request->all());
+        echo 'Atualização realizada com sucesso';
     }
 
     /**

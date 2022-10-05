@@ -52,12 +52,12 @@ class FornecedorController extends Controller
 
     public function listar(Request $request){
         
-        $fornecedores = Fornecedor::where('nome','like','%'.$request->input('nome').'%')
+        $fornecedores = Fornecedor::with(['produtos'])->where('nome','like','%'.$request->input('nome').'%')
                                     ->where('site','like','%'.$request->input('site').'%')
                                     ->where('uf','like','%'.$request->input('uf').'%')
                                     ->where('email','like','%'.$request->input('email').'%')
                                     //->get(); atualizado na aula 156 para permitir paginação
-                                    ->paginate(2);
+                                    ->paginate(5);
 
 
        
@@ -126,6 +126,20 @@ class FornecedorController extends Controller
         $fornecedor = Fornecedor::find($id);
 
         return view('app.fornecedor.adicionar',['fornecedor'=>$fornecedor, 'msg' => $msg]);
+
+    }
+
+    //aula 158 implementando remoção de fornecedores
+    public function excluir($id){
+                
+        //usa softdelete para remover o registro
+        Fornecedor::find($id)->delete();
+
+        //opção 2 - força deleção do banco 
+        //Fornecedor::find($id)->forcedelete();
+
+        return redirect()->route('app.fornecedor');
+      
 
     }
 }

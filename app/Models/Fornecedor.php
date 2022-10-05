@@ -17,4 +17,9 @@ class Fornecedor extends Model
     // adicionado na aula 93 - permite executar a classe sem instanciar
     protected $fillable = ['nome','site','uf','email'];
 
+    //Aula 185
+    public function produtos(){
+        return $this->hasMany('App\Models\Item','fornecedor_id','id');
+    }
+
 }

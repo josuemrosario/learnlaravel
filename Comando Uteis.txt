@@ -1,0 +1,31 @@
+CONTROLLERS
+=================================
+
+- Criar um controller com o resource
+php artisan make:controller --resource NomeController
+
+
+MODEL
+=================================
+
+- Criar um model
+php artisan make:model nome_modelo
+
+
+
+MIGRATION
+=================================
+
+- Criar migration
+php artisan make:migration create_clientes_pedidos_produtos
+
+- Verificar status
+php artisan migrate:status
+
+- Executar migration
+php artisan migrate
+
+- Voltar o ultimo step
+ php artisan migrate:rollback --step=1
+
+

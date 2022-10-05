@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 //Aula 136 - Criando meu primeiro middleware
 use App\Http\middleware\logAcessoMiddleware;
 
+//Aula 160
+use App\Models\Produto;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -80,8 +83,11 @@ Route::get(
 // Aula 143 acrescentado parametros para ser passar o middleware
 Route::middleware('autenticacao:padrao,visitante')->prefix('/app')->group(function(){
 
+    
+    /*  retirado na aula 188 
     Route::get('/cliente',[\App\Http\Controllers\ClienteController::class,'index'])
         ->name('app.cliente');
+     */   
 
     //Route::get('/fornecedores',function(){ return 'fornecedores';})->name('app.fornecedores');
     Route::get('/fornecedor',[\App\Http\Controllers\FornecedorController::class,'index'])
@@ -104,6 +110,11 @@ Route::middleware('autenticacao:padrao,visitante')->prefix('/app')->group(functi
     Route::get('/fornecedor/editar/{id}/{msg?}',[\App\Http\Controllers\FornecedorController::class,'editar'])
         ->name('app.fornecedor.editar');        
 
+
+    //aula 158 implementando cadastro fornecedores parte  5
+    Route::get('/fornecedor/excluir/{id}',[\App\Http\Controllers\FornecedorController::class,'excluir'])
+        ->name('app.fornecedor.excluir');        
+
     Route::get('/produto',[\App\Http\Controllers\ProdutoController::class,'index'])
         ->name('app.produto');
 
@@ -114,6 +125,30 @@ Route::middleware('autenticacao:padrao,visitante')->prefix('/app')->group(functi
 
     Route::get('/sair',[\App\Http\Controllers\LoginController::class,'sair'])         
         ->name('app.sair');
+
+
+    //160 criando rotas associadas a resources
+    //rotas sao criadas automaticamente porque produto usa resources
+    Route::resource('produto', 'App\Http\Controllers\ProdutoController');
+
+
+    //Aula 173
+    Route::resource('produto-detalhe', 'App\Http\Controllers\ProdutoDetalheController');
+
+
+    //aula 188
+    Route::resource('cliente', 'App\Http\Controllers\ClienteController');
+    Route::resource('pedido', 'App\Http\Controllers\PedidoController');
+    //Route::resource('pedido-produto', 'App\Http\Controllers\PedidoProdutoController');
+
+    //aula 193
+    Route::get('/pedido-produto/create/{pedido}',[\App\Http\Controllers\PedidoProdutoController::class,'create'])         
+        ->name('pedido-produto.create');
+
+    Route::post('/pedido-produto/store/{pedido}',[\App\Http\Controllers\PedidoProdutoController::class,'store'])         
+        ->name('pedido-produto.store');
+
+    
 });
 
 /* Aulas 38: Redirecionanento de rotas 
